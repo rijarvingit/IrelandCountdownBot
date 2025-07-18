@@ -7,8 +7,9 @@ concurrency:
 
 on:
   schedule:
-    - cron: '0 17 * * *'  # 17:00 UTC = 18:00 CET (UTC+1)
-  workflow_dispatch:       # Allows manual triggers
+  - cron: '0 16 * * *'  # 18:00 CEST (summer)
+  - cron: '0 17 * * *'  # 18:00 CET (winter)
+workflow_dispatch:
 
 jobs:
   send-update:
