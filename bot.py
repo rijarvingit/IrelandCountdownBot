@@ -19,6 +19,9 @@ TARGET_TIME = datetime(2025, 8, 16, 19, 30, tzinfo=pytz.timezone('Europe/Dublin'
 # Get bot token from environment variables (set in GitHub Secrets)
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
+# You need to add:
+GROUP_IDS = ["-1002859929632"]  # Your target group ID
+
 # === TEMPORARY GROUP ID FETCHER ===
 async def get_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
