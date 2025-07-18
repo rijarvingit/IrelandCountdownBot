@@ -1,0 +1,21 @@
+name: Daily Countdown Update
+on:
+  schedule:
+    - cron: '0 12 * * *'  # Runs daily at 12:00 UTC (adjust if needed)
+  workflow_dispatch:       # Allows manual triggers
+
+jobs:
+  send-update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: pip install python-telegram-bot pytz
+      - name: Run Bot
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: python bot.py
