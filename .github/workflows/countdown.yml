@@ -1,16 +1,8 @@
 name: Daily Countdown Update
-
-concurrency: 
-  group: countdown-bot
-  cancel-in-progress: true
-
-
 on:
   schedule:
-  - cron: '0 16 * * *'  # 18:00 CEST (summer)
-  - cron: '0 17 * * *'  # 18:00 CET (winter)
-workflow_dispatch:
-
+    - cron: '0 17 * * *'  # 17:00 UTC (19:00 CEST)
+  workflow_dispatch:
 jobs:
   send-update:
     runs-on: ubuntu-latest
