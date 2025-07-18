@@ -20,7 +20,10 @@ TARGET_TIME = datetime(2025, 8, 16, 19, 30, tzinfo=pytz.timezone('Europe/Dublin'
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # You need to add:
-GROUP_IDS = ["-1002859929632"]  # Your target group ID
+GROUP_IDS = [
+    "-1002859929632"
+    "-1002890597287"
+]  # Your target group ID
 
 # === TEMPORARY GROUP ID FETCHER ===
 async def get_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
