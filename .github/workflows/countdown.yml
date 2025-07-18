@@ -1,7 +1,7 @@
 name: Daily Countdown Update
 on:
   schedule:
-    - cron: '0 17 * * *'  # 17:00 UTC (19:00 CEST)
+    - cron: '*/10 * * * *'  # Test: Runs every 10 minutes
   workflow_dispatch:
 jobs:
   send-update:
