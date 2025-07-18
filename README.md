@@ -1,0 +1,2 @@
+# IrelandCountdownBot
+Ireland IST
