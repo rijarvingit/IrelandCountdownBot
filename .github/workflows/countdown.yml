@@ -1,7 +1,7 @@
 name: Daily Telegram Countdown
 
 on:
-  # schedule:
+  schedule:
      - cron: '30 18 * * *'  # Disabled to prevent automatic runs
   workflow_dispatch:         # Manual trigger for testing
 
