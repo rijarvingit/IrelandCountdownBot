@@ -1,20 +1,29 @@
-name: Daily Countdown Update
+name: Daily Telegram Countdown
+
 on:
-  schedule:
-    #- cron: '*/10 * * * *'  # Test: Runs every 10 minutes
-  workflow_dispatch:
+  # schedule:
+  #   - cron: '30 19 * * *'  # Disabled to prevent automatic runs
+  workflow_dispatch:         # Manual trigger for testing
+
 jobs:
-  send-update:
+  send-countdown:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: '3.10'
+
       - name: Install dependencies
-        run: pip install python-telegram-bot pytz
-      - name: Run Bot
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Telegram bot script
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: python bot.py
