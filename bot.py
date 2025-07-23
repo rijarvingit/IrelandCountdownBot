@@ -1,99 +1,65 @@
-from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes
-from datetime import datetime, timedelta
-import pytz
 import os
+import asyncio
+from datetime import datetime
+import pytz
 import logging
+from telegram import Bot
+from telegram.error import TelegramError
 
 # === CONFIGURATION SECTION ===
-# Set up basic logging to track bot activity
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Target time for the countdown (16th August 2025, 19:30 Dublin time)
 TARGET_TIME = datetime(2025, 8, 16, 19, 30, tzinfo=pytz.timezone('Europe/Dublin'))
 
-# Get bot token from environment variables (set in GitHub Secrets)
+# Get bot token and group IDs from environment variables
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-
-# You need to add:
 GROUP_IDS = [
-    "-1002859929632"
-    "-1002890597287"
-]  # Your target group ID
-
-# === TEMPORARY GROUP ID FETCHER ===
-async def get_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """
-    Temporary command to fetch group ID
-    Usage: Send /getid in any chat to see its ID
-    """
-    chat_id = update.effective_chat.id
-    await update.message.reply_text(
-        f"🔍 Chat Information:\n"
-        f"ID: `{chat_id}`\n"
-        f"Type: {update.effective_chat.type}\n"
-        f"Title: {getattr(update.effective_chat, 'title', 'N/A')}",
-        parse_mode="Markdown"
-    )
+    "-1002859929632",  # Active group for testing
+    # "-1002890597287",  # Commented out for now
+]
 
 # === MAIN COUNTDOWN FUNCTION ===
-async def send_update(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """
-    Handle /countdown command - calculates time remaining and sends formatted message
-    """
-    try:
-        # Get current time in Dublin timezone
-        now = datetime.now(pytz.timezone('Europe/Dublin'))
-        remaining = TARGET_TIME - now
-        
-        # Prepare message based on whether event has started
-        if remaining.total_seconds() <= 0:
-            message = "🎉 The Ireland IST Expedition has begun! 🎉"
-        else:
-            days = remaining.days
-            hours, remainder = divmod(remaining.seconds, 3600)
-            minutes, seconds = divmod(remainder, 60)
-            
-            message = (
-                "⏳ **Ireland IST Expedition Countdown** ⏳\n\n"
-                f"🗓️ **{days} days**\n"
-                f"🕒 **{hours} hours**\n"
-                f"⏱️ **{minutes} minutes**\n"
-                f"⏲️ **{seconds} seconds**\n\n"
-                "_Next update in 24 hours_"
-            )
-        
-        # Send and pin the message
-        sent_msg = await update.message.reply_text(message, parse_mode="Markdown")
+async def send_daily_update():
+    """Send countdown message to all configured Telegram groups."""
+    if not BOT_TOKEN:
+        logger.error("BOT_TOKEN not set")
+        return
+    if not GROUP_IDS or not GROUP_IDS[0]:
+        logger.error("GROUP_IDS not set or empty")
+        return
+
+    bot = Bot(token=BOT_TOKEN)
+    now = datetime.now(pytz.timezone('Europe/Dublin'))
+    remaining = TARGET_TIME - now
+
+    if remaining.total_seconds() <= 0:
+        message = "🎉 The Ireland IST Expedition has begun! 🎉"
+    else:
+        days = remaining.days
+        hours, remainder = divmod(remaining.seconds, 3600)
+        minutes, _ = divmod(remainder, 60)
+        message = (
+            "⏳ **Ireland IST Expedition Countdown** ⏳\n\n"
+            f"🗓️ **{days} days**\n"
+            f"🕒 **{hours} hours**\n"
+            f"⏱️ **{minutes} minutes**\n\n"
+            "_Next update in 24 hours_"
+        )
+
+    for chat_id in GROUP_IDS:
         try:
-            await sent_msg.pin(disable_notification=True)
-            logger.info(f"Message pinned in chat {update.effective_chat.id}")
-        except Exception as e:
-            logger.warning(f"Pinning failed: {e}")
+            sent_msg = await bot.send_message(chat_id=chat_id.strip(), text=message, parse_mode="Markdown")
+            logger.info(f"Message sent to chat {chat_id}")
+            try:
+                await sent_msg.pin(disable_notification=True)
+                logger.info(f"Message pinned in chat {chat_id}")
+            except TelegramError as e:
+                logger.warning(f"Pinning failed in chat {chat_id}: {e}")
+        except TelegramError as e:
+            logger.error(f"Failed to send message to chat {chat_id}: {e}")
 
-    except Exception as e:
-        logger.error(f"Error in send_update: {e}")
-        await update.message.reply_text("⚠️ Failed to update countdown")
-
-# === BOT SETUP ===
-def main():
-    """Initialize and configure the bot application"""
-    # Create Application instance with your bot token
-    app = Application.builder().token(BOT_TOKEN).build()
-    
-    # Register command handlers
-    app.add_handler(CommandHandler("getid", get_id))      # Temporary ID fetcher
-    app.add_handler(CommandHandler("countdown", send_update))  # Main functionality
-    
-    # Start the bot in polling mode
-    app.run_polling()
-
-# === ENTRY POINT ===
 if __name__ == "__main__":
-    # This block runs when executing the script directly
-    logger.info("Starting bot application...")
-    main()
+    logger.info("Starting daily update...")
+    asyncio.run(send_daily_update())
