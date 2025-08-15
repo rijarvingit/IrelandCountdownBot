@@ -11,13 +11,13 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 # Target time for the countdown (16th August 2025, 19:30 Dublin time)
-TARGET_TIME = datetime(2025, 8, 16, 19, 30, tzinfo=pytz.timezone('Europe/Dublin'))
+TARGET_TIME = datetime(2025, 11, 11, 19, 30, tzinfo=pytz.timezone('Europe/Dublin'))
 
 # Get bot token and group IDs from environment variables
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 GROUP_IDS = [
     "-1002859929632",  # Active group for testing
-    "-1002890597287",  # Commented out for now
+    #"-XXX,  # Commented out for now
 ]
 
 # === MAIN COUNTDOWN FUNCTION ===
@@ -41,10 +41,10 @@ async def send_daily_update():
         hours, remainder = divmod(remaining.seconds, 3600)
         minutes, _ = divmod(remainder, 60)
         message = (
-            "⏳ **Ireland IST Expedition Countdown** ⏳\n\n"
+            "⏳ **Australia Tour Countdown** ⏳\n\n"
             f"🗓️ **{days} days**\n"
-            f"🕒 **{hours} hours**\n"
-            f"⏱️ **{minutes} minutes**\n\n"
+            #f"🕒 **{hours} hours**\n"
+            #f"⏱️ **{minutes} minutes**\n\n"
             "_Next update in 24 hours_"
         )
 
@@ -52,9 +52,9 @@ async def send_daily_update():
         try:
             sent_msg = await bot.send_message(chat_id=chat_id.strip(), text=message, parse_mode="Markdown")
             logger.info(f"Message sent to chat {chat_id}")
-            try:
-                await sent_msg.pin(disable_notification=True)
-                logger.info(f"Message pinned in chat {chat_id}")
+            #try:
+                #await sent_msg.pin(disable_notification=True)
+                #logger.info(f"Message pinned in chat {chat_id}")
             except TelegramError as e:
                 logger.warning(f"Pinning failed in chat {chat_id}: {e}")
         except TelegramError as e:
