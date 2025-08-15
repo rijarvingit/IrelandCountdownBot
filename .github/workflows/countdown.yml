@@ -25,4 +25,4 @@ jobs:
           POSITIVE_BOT_TOKEN: ${{ secrets.BOT_TOKEN }}  # or change your code to read BOT_TOKEN
           # If your countdown bot needs group IDs as a secret:
           # GROUP_IDS: ${{ secrets.GROUP_IDS }}
-        run: countdown.py
+        run: bot.py
