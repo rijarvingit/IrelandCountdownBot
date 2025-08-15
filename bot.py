@@ -17,7 +17,7 @@ TARGET_TIME = datetime(2025, 8, 16, 19, 30, tzinfo=pytz.timezone('Europe/Dublin'
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 GROUP_IDS = [
     "-1002859929632",  # Active group for testing
-    "-1002890597287",  # Commented out for now
+    #"-1002890597287",  # Commented out for now
 ]
 
 # === MAIN COUNTDOWN FUNCTION ===
